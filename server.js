@@ -1,20 +1,35 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const e = require('express');
 
 const app = express();
 const port = process.env.PORT || 8080;
 
-app.get('/', (req, res) => {
+app.engine('html', require('ejs').renderFile);
 
-    fs.readFile('/etc/hosts', 'utf8', function (err, data) {
+app.get('/', (req, res) => {
+    
+    var count;
+    
+    fs.readFile('count.txt', 'utf8', function (err, data) {
         if (err) {
           return console.log(err);
         }
+
         count = parseInt(data);
+        count++;
+        count = count.toString();
+
+        fs.writeFile('count.txt', count, err => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
     });
 
-    res.render('index.html',{count: count});
+    res.render('index.html', {count: count});
 })
 
 app.listen(port, () => {
